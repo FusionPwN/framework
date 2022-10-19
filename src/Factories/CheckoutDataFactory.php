@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Vanilo\Framework\Factories;
 
 use Konekt\Address\Contracts\Address as AddressContract;
-use Konekt\Address\Models\AddressType;
+use Konekt\Address\Models\AddressTypeProxy;
 use Vanilo\Checkout\Contracts\CheckoutDataFactory as CheckoutDataFactoryContract;
 use Vanilo\Contracts\Address;
 use Vanilo\Contracts\Billpayer;
@@ -27,7 +27,7 @@ class CheckoutDataFactory implements CheckoutDataFactoryContract
 		$billpayer = app(BillpayerContract::class);
 
 		$address = app(AddressContract::class);
-		$address->type = AddressType::BILLING;
+		$address->type = AddressTypeProxy::BILLING();
 
 		$billpayer->address()->associate($address);
 
@@ -37,7 +37,7 @@ class CheckoutDataFactory implements CheckoutDataFactoryContract
 	public function createShippingAddress(): Address
 	{
 		$address = app(AddressContract::class);
-		$address->type = AddressType::SHIPPING;
+		$address->type = AddressTypeProxy::SHIPPING();
 
 		return $address;
 	}
