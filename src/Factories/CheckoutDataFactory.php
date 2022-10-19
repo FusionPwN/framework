@@ -22,23 +22,23 @@ use Vanilo\Order\Contracts\Billpayer as BillpayerContract;
 
 class CheckoutDataFactory implements CheckoutDataFactoryContract
 {
-    public function createBillpayer(): Billpayer
-    {
-        $billpayer = app(BillpayerContract::class);
+	public function createBillpayer(): Billpayer
+	{
+		$billpayer = app(BillpayerContract::class);
 
-        $address = app(AddressContract::class);
-        $address->type = AddressType::BILLING;
+		$address = app(AddressContract::class);
+		$address->type = AddressType::BILLING;
 
-        $billpayer->address()->associate($address);
+		$billpayer->address()->associate($address);
 
-        return $billpayer;
-    }
+		return $billpayer;
+	}
 
-    public function createShippingAddress(): Address
-    {
-        $address = app(AddressContract::class);
-        $address->type = AddressType::SHIPPING;
+	public function createShippingAddress(): Address
+	{
+		$address = app(AddressContract::class);
+		$address->type = AddressType::SHIPPING;
 
-        return $address;
-    }
+		return $address;
+	}
 }

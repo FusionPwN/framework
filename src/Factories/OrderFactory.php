@@ -19,25 +19,32 @@ use Vanilo\Order\Factories\OrderFactory as BaseOrderFactory;
 
 class OrderFactory extends BaseOrderFactory
 {
-    public function createFromCheckout(Checkout $checkout)
-    {
-        $orderData = [
-            'billpayer' => $checkout->getBillpayer()->toArray(),
-            'shippingAddress' => $checkout->getShippingAddress()->toArray()
-        ];
+	public function createFromCheckout(Checkout $checkout)
+	{
+		$cart = $checkout->getCart();
+		$orderData = [
+			'billpayer' 		=> $checkout->getBillpayer()->toArray(),
+			'shippingAddress' 	=> $checkout->getShippingAddress()->toArray(),
+			'total' 			=> $cart->total(),
+			'vat'               => $cart->vatTotal(),
+			'adjustments'       => $cart->adjustments(),
+		];
+		//
+		$items = $this->convertCartItemsToDataArray($cart);
 
-        $items = $this->convertCartItemsToDataArray($checkout->getCart());
+		return $this->createFromDataArray($orderData, $items);
+	}
 
-        return $this->createFromDataArray($orderData, $items);
-    }
-
-    protected function convertCartItemsToDataArray(CheckoutSubject $cart)
-    {
-        return $cart->getItems()->map(function ($item) {
-            return [
-                'product' => $item->getBuyable(),
-                'quantity' => $item->getQuantity()
-            ];
-        })->all();
-    }
+	protected function convertCartItemsToDataArray(CheckoutSubject $cart)
+	{
+		return $cart->getItems()->map(function ($item) {
+			return [
+				'product' 		=> $item->getBuyable(),
+				'adjustments' 	=> $item->adjustments(),
+				'quantity' 		=> $item->getQuantity(),
+				'price'			=> $item->getAdjustedPrice(),
+				'weight'		=> $item->product->weight()
+			];
+		})->all();
+	}
 }
