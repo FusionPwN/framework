@@ -27,8 +27,8 @@
         "vanilo/category": "^2.2",
         "vanilo/product": "^2.2",
         "vanilo/cart": "^2.2",
-        "vanilo/checkout": "^2.2",
-        "vanilo/order": "^2.2",
+        "vanilo/checkout": "2.2.x-no-billpayer",
+        "vanilo/order": "2.2.x-no-billpayer",
         "vanilo/properties": "^2.2",
         "vanilo/channel": "^2.2",
         "vanilo/payment": "^2.2"
