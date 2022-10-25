@@ -24,8 +24,6 @@ use Vanilo\Category\Contracts\Taxon as TaxonContract;
 use Vanilo\Category\Contracts\Taxonomy as TaxonomyContract;
 use Vanilo\Category\Models\TaxonomyProxy;
 use Vanilo\Category\Models\TaxonProxy;
-use Vanilo\Checkout\Contracts\CheckoutDataFactory as CheckoutDataFactoryContract;
-use Vanilo\Framework\Factories\CheckoutDataFactory;
 use Vanilo\Framework\Factories\OrderFactory;
 use Vanilo\Framework\Http\Requests\CreateChannel;
 use Vanilo\Framework\Http\Requests\CreateMedia;
