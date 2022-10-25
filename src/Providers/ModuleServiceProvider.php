@@ -92,8 +92,6 @@ class ModuleServiceProvider extends BaseBoxServiceProvider
     public function register()
     {
         parent::register();
-
-        $this->app->bind(CheckoutDataFactoryContract::class, CheckoutDataFactory::class);
     }
 
     public function boot()
