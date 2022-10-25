@@ -23,8 +23,8 @@ class OrderFactory extends BaseOrderFactory
 	{
 		$cart = $checkout->getCart();
 		$orderData = [
-			'billpayer' 		=> $checkout->getBillpayer()->toArray(),
-			'shippingAddress' 	=> $checkout->getShippingAddress()->toArray(),
+			'billpayer' 		=> $checkout->getBillpayer(),
+			'shippingAddress' 	=> $checkout->getShippingAddress(),
 			'total' 			=> $cart->total(),
 			'vat'               => $cart->vatTotal(),
 			'adjustments'       => $cart->adjustments(),
