@@ -29,7 +29,7 @@ class OrderFactory extends BaseOrderFactory
 			'vat'               => $cart->vatTotal(),
 			'adjustments'       => $cart->adjustments(),
 		];
-		//
+		
 		$items = $this->convertCartItemsToDataArray($cart);
 
 		return $this->createFromDataArray($orderData, $items);
