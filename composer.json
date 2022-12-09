@@ -14,6 +14,12 @@
     "support": {
         "issues": "https://github.com/vanilophp/framework/issues"
     },
+	"repositories": [
+        {
+            "url": "https://github.com/FusionPwN/support.git",
+            "type": "git"
+        }
+    ],
     "require": {
         "php": "^8.0",
         "ext-json": "*",
@@ -22,7 +28,7 @@
         "konekt/appshell": "^2.2",
         "konekt/concord": "^1.10",
         "spatie/laravel-medialibrary": "^8.0|^9.0",
-        "vanilo/support": "^2.2",
+        "vanilo/support": "^2.2.1",
         "vanilo/category": "^2.2",
         "vanilo/channel": "^2.2"
     },
