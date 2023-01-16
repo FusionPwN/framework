@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Http\Controllers;
 
+use App\Models\Admin\PaymentMethodsLocations;
 use Konekt\AppShell\Http\Controllers\BaseController;
 use Vanilo\Framework\Contracts\Requests\CreatePaymentMethod;
 use Vanilo\Framework\Contracts\Requests\UpdatePaymentMethod;
@@ -60,13 +61,15 @@ class PaymentMethodController extends BaseController
         return view('vanilo::payment-method.show', ['paymentMethod' => $paymentMethod]);
     }
 
-    public function edit(PaymentMethod $paymentMethod)
-    {
-        return view('vanilo::payment-method.edit', [
-            'paymentMethod' => $paymentMethod,
-            'gateways' => PaymentGateways::choices(),
-        ]);
-    }
+	public function edit(PaymentMethod $paymentMethod)
+	{
+		return view('vanilo::payment-method.edit', [
+			'types' => PaymentMethodsLocations::choices(),
+			'type_default' => PaymentMethodsLocations::ALL,
+			'paymentMethod' => $paymentMethod,
+			'gateways' => PaymentGateways::choices(),
+		]);
+	}
 
     public function update(PaymentMethod $paymentMethod, UpdatePaymentMethod $request)
     {
