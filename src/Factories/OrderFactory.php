@@ -29,12 +29,12 @@ class OrderFactory extends BaseOrderFactory
 		];
 
 		if (null !== $cart) {
-			$orderData = [
+			$orderData = array_merge($orderData, [
 				'total' 			=> $cart->total(),
 				'totalWithCard'		=> $cart->totalWithCard(),
 				'vat'               => $cart->vatTotal(),
 				'adjustments'       => $cart->adjustments(),
-			];
+			]);
 
 			$items = $this->convertCartItemsToDataArray($cart);
 		}
