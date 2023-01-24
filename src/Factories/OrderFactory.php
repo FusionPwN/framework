@@ -23,17 +23,23 @@ class OrderFactory extends BaseOrderFactory
 	{
 		$cart = $checkout->getCart();
 		$orderData = [
+			'type'				=> $checkout->getType(),
 			'billpayer' 		=> $checkout->getBillpayer(),
-			'shippingAddress' 	=> $checkout->getShippingAddress(),
-			'total' 			=> $cart->total(),
-			'totalWithCard'		=> $cart->totalWithCard(),
-			'vat'               => $cart->vatTotal(),
-			'adjustments'       => $cart->adjustments(),
+			'shippingAddress' 	=> $checkout->getShippingAddress()
 		];
-		
-		$items = $this->convertCartItemsToDataArray($cart);
 
-		return $this->createFromDataArray($orderData, $items);
+		if (null !== $cart) {
+			$orderData = [
+				'total' 			=> $cart->total(),
+				'totalWithCard'		=> $cart->totalWithCard(),
+				'vat'               => $cart->vatTotal(),
+				'adjustments'       => $cart->adjustments(),
+			];
+
+			$items = $this->convertCartItemsToDataArray($cart);
+		}
+
+		return $this->createFromDataArray($orderData, $items ?? []);
 	}
 
 	protected function convertCartItemsToDataArray(CheckoutSubject $cart)
