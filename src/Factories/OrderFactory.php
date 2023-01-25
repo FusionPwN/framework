@@ -28,7 +28,6 @@ class OrderFactory extends BaseOrderFactory
 			'billpayer' 		=> $checkout->getBillpayer(),
 			'shippingAddress' 	=> $checkout->getShippingAddress(),
 			'total' 			=> 0,
-			'totalWithCard'		=> 0,
 			'vat'               => 0,
 			'adjustments'       => [],
 		];
