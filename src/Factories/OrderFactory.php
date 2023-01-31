@@ -27,6 +27,7 @@ class OrderFactory extends BaseOrderFactory
 			'user_id'			=> $checkout->getUserId(),
 			'billpayer' 		=> $checkout->getBillpayer(),
 			'shippingAddress' 	=> $checkout->getShippingAddress(),
+			'customAttributes'	=> $checkout->getCustomAttributes(),
 			'total' 			=> 0,
 			'vat'               => 0,
 			'adjustments'       => [],
