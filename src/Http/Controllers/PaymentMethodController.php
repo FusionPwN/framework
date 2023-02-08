@@ -34,6 +34,8 @@ class PaymentMethodController extends BaseController
     public function create()
     {
         return view('vanilo::payment-method.create', [
+            'types' => PaymentMethodsLocations::choices(),
+			'type_default' => PaymentMethodsLocations::ALL,
             'paymentMethod' => app(PaymentMethod::class),
             'gateways' => PaymentGateways::choices(),
         ]);
