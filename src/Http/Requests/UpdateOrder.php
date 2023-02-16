@@ -21,25 +21,25 @@ use Vanilo\Order\Models\OrderStatusProxy;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
-    public function rules()
-    {
-        return [
-            'status' => ['required', Rule::in(OrderStatusProxy::values())]
-        ];
-    }
+	public function rules()
+	{
+		return [
+			'status' => [Rule::in(OrderStatusProxy::values())]
+		];
+	}
 
-    public function wantsToChangeOrderStatus(Order $order): bool
-    {
-        return $this->getStatus() !== $order->getStatus()->value();
-    }
+	public function wantsToChangeOrderStatus(Order $order): bool
+	{
+		return $this->getStatus() !== $order->getStatus()->value() && in_array($this->getStatus(), OrderStatusProxy::values());
+	}
 
-    public function getStatus(): string
-    {
-        return $this->get('status');
-    }
+	public function getStatus(): string
+	{
+		return $this->get('status', '');
+	}
 
-    public function authorize()
-    {
-        return true;
-    }
+	public function authorize()
+	{
+		return true;
+	}
 }
