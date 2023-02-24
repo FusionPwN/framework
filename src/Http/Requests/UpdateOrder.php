@@ -113,6 +113,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			'billing_city' 			=> __('backoffice.order.city'),
 			'billing_country_id' 	=> __('backoffice.order.country'),
 			'billing_postalcode' 	=> __('backoffice.order.postalcode'),
+			'shipping.id' 			=> strtolower(__('frontoffice.shipping_method')),
+			'store.id' 				=> strtolower(__('frontoffice.pick-up shop')),
 		];
 	}
 
