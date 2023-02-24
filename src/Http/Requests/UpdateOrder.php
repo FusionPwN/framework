@@ -62,6 +62,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
 				array_push($rules['nif'], new IsValidNIF);
 			}
+		} else if ($this->get('type') == 'shipping-method') {
+			$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
 		}
 
 		return $rules;
