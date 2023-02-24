@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Http\Requests;
 
+use App\Models\Admin\ShipmentMethod;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -64,6 +65,12 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			}
 		} else if ($this->get('type') == 'shipping-method') {
 			$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
+
+			$shippingMethod = $this->shippingMethod();
+
+			if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
+				$rules['store.id'] = ['required', 'exists:stores,id'];
+			}
 		}
 
 		return $rules;
@@ -92,6 +99,11 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 	public function client(): User
 	{
 		return User::find($this->get('user_id'));
+	}
+
+	public function shippingMethod(): ?ShipmentMethod
+	{
+		return ShipmentMethod::find($this->shipping['id']);
 	}
 
 	public function attributes()
