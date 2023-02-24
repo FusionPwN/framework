@@ -104,12 +104,12 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 
 	public function shippingMethod(): ?ShipmentMethod
 	{
-		return ShipmentMethod::find($this->get('shipping.id'));
+		return ShipmentMethod::find($this->shipping['id']);
 	}
 
 	public function store(): ?Store
 	{
-		return Store::find($this->get('store.id'));
+		return Store::find($this->store['id']);
 	}
 
 	public function attributes()
