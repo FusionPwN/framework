@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Vanilo\Framework\Http\Requests;
 
 use App\Models\Admin\ShipmentMethod;
+use App\Models\Admin\Store;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -103,7 +104,12 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 
 	public function shippingMethod(): ?ShipmentMethod
 	{
-		return ShipmentMethod::find($this->shipping['id']);
+		return ShipmentMethod::find($this->get('shipping.id'));
+	}
+
+	public function store(): ?Store
+	{
+		return Store::find($this->get('store.id'));
 	}
 
 	public function attributes()
