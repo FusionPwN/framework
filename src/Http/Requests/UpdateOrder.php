@@ -70,25 +70,29 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 		} else if ($this->get('type') == 'shipping-method') {
 			$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
 
-			$shippingMethod = $this->shippingMethod();
+			if (isset($this->shipping['id'])) {
+				$shippingMethod = $this->shippingMethod();
 
-			if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
-				$rules['store.id'] = ['required', 'exists:stores,id'];
+				if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
+					$rules['store.id'] = ['required', 'exists:stores,id'];
+				}
 			}
 		} else if ($this->get('type') == 'payment-method') {
 			$rules['payment.id'] = ['required', 'exists:payment_methods,id'];
 
-			$paymentMethod = $this->paymentMethod();
+			if (isset($this->payment['id'])) {
+				$paymentMethod = $this->paymentMethod();
 
-			if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
-				$order = $this->order();
-				if ($order->isSimpleBilling()) {
-					$country_service = $order->country;
-				} else {
-					$country_service = $order->billingCountry;
+				if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
+					$order = $this->order();
+					if ($order->isSimpleBilling()) {
+						$country_service = $order->country;
+					} else {
+						$country_service = $order->billingCountry;
+					}
+
+					$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
 				}
-				
-				$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
 			}
 		}
 
