@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Factories;
 
+use App\Models\Admin\Order;
 use Vanilo\Checkout\Contracts\Checkout;
 use Vanilo\Contracts\CheckoutSubject;
 use Vanilo\Order\Factories\OrderFactory as BaseOrderFactory;
+use Vanilo\Order\Models\OrderStatusProxy;
 
 class OrderFactory extends BaseOrderFactory
 {
@@ -41,6 +43,33 @@ class OrderFactory extends BaseOrderFactory
 
 			$items = $this->convertCartItemsToDataArray($cart);
 		}
+
+		return $this->createFromDataArray($orderData, $items ?? []);
+	}
+
+	public function createFromOrder(Order $order)
+	{
+		$orderData = [
+			'type'				=> 'backoffice',
+			'user_id'			=> $order->user_id,
+			'customAttributes'	=> [
+				'order_id' => $order->id
+			],
+			'total' 			=> $order->total(),
+			'vat'               => $order->vatTotal(),
+			'adjustments'       => $order->adjustments(),
+			'status'			=> OrderStatusProxy::PENDING()->value()
+		];
+
+		$items = $order->items->map(function ($item) {
+			return [
+				'product' 		=> $item->getBuyable(),
+				'adjustments' 	=> $item->adjustments(),
+				'quantity' 		=> $item->getQuantity(),
+				'price'			=> $item->getAdjustedPrice(),
+				'weight'		=> $item->product->weight()
+			];
+		})->all();
 
 		return $this->createFromDataArray($orderData, $items ?? []);
 	}
