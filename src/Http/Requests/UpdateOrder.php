@@ -125,7 +125,7 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 		return ShipmentMethod::find($this->shipping['id']);
 	}
 
-	public function paymentMethod(): PaymentMethod
+	public function paymentMethod(): ?PaymentMethod
 	{
 		return PaymentMethod::find($this->payment['id']);
 	}
