@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Http\Requests;
 
+use App\Models\Admin\Order as AdminOrder;
 use App\Models\Admin\ShipmentMethod;
 use App\Models\Admin\Store;
 use App\Models\User;
@@ -25,6 +26,8 @@ use App\Rules\IsValidNIF;
 use App\Rules\IsValidPostalCodePTC;
 use Konekt\Address\Models\Country;
 use Konekt\Address\Models\CountryProxy;
+use Vanilo\Framework\Models\PaymentMethod;
+use Vanilo\Order\Models\OrderProxy;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
@@ -72,6 +75,20 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
 				$rules['store.id'] = ['required', 'exists:stores,id'];
 			}
+		} else if ($this->get('type') == 'payment-method') {
+			$rules['payment.id'] = ['required', 'exists:payment_methods,id'];
+
+			$paymentMethod = $this->paymentMethod();
+
+			if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
+				$order = $this->order();
+				if ($order->isSimpleBilling()) {
+					$country_service = $order->country();
+				} else {
+					$country_service = $order->billingCountry();
+				}
+				$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
+			}
 		}
 
 		return $rules;
@@ -89,12 +106,12 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 
 	public function shippingCountry(): Country
 	{
-		return CountryProxy::find($this['shipping_country_id']);
+		return CountryProxy::find($this->shipping_country_id);
 	}
 
 	public function billingCountry(): Country
 	{
-		return CountryProxy::find($this['billing_country_id']);
+		return CountryProxy::find($this->billing_country_id);
 	}
 
 	public function client(): User
@@ -107,9 +124,19 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 		return ShipmentMethod::find($this->shipping['id']);
 	}
 
+	public function paymentMethod(): PaymentMethod
+	{
+		return PaymentMethod::find($this->payment['id']);
+	}
+
 	public function store(): ?Store
 	{
 		return Store::find($this->store['id']);
+	}
+
+	public function order(): AdminOrder
+	{
+		return OrderProxy::find($this->order);
 	}
 
 	public function attributes()
