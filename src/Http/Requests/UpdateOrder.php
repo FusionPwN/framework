@@ -83,10 +83,11 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
 				$order = $this->order();
 				if ($order->isSimpleBilling()) {
-					$country_service = $order->country();
+					$country_service = $order->country;
 				} else {
-					$country_service = $order->billingCountry();
+					$country_service = $order->billingCountry;
 				}
+				
 				$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
 			}
 		}
