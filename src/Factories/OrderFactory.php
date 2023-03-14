@@ -32,7 +32,7 @@ class OrderFactory extends BaseOrderFactory
 			'customAttributes'	=> $checkout->getCustomAttributes(),
 			'total' 			=> 0,
 			'vat'               => 0,
-			'adjustments'       => [],
+			'adjustments'       => null,
 		];
 
 		if (null !== $cart) {
@@ -63,11 +63,13 @@ class OrderFactory extends BaseOrderFactory
 
 		$items = $order->items->map(function ($item) {
 			return [
-				'product' 		=> $item->getBuyable(),
-				'adjustments' 	=> $item->adjustments(),
-				'quantity' 		=> $item->getQuantity(),
-				'price'			=> $item->getAdjustedPrice(),
-				'weight'		=> $item->product->weight()
+				'product' 		 => $item->getBuyable(),
+				'adjustments' 	 => $item->adjustments(),
+				'quantity' 		 => $item->getQuantity(),
+				'original_price' => $item->getOriginalPrice(),
+				'mod_price'		 => $item->getModifiedPrice(),
+				'price'			 => $item->getAdjustedPrice(),
+				'weight'		 => $item->product->weight()
 			];
 		})->all();
 

@@ -94,6 +94,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 					$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
 				}
 			}
+		} else if ($this->get('type') == 'order-items') {
+			$rules['items'] = ['required'];
 		}
 
 		return $rules;
@@ -167,6 +169,13 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			'store.id' 				=> strtolower(__('frontoffice.pick-up shop')),
 			'mbway_phone' 			=> strtolower(__('frontoffice.phone')),
 			'payment.id' 			=> strtolower(__('frontoffice.payment_method')),
+		];
+	}
+
+	public function messages(): array
+	{
+		return [
+			'items.required' => __('backoffice.order.edit-items-error')
 		];
 	}
 
