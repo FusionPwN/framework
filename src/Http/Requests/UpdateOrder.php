@@ -95,7 +95,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 				}
 			}
 		} else if ($this->get('type') == 'order-items') {
-			$rules['items'] = ['required'];
+			$rules['items'] = ['required_without:itemsalt'];
+			$rules['itemsalt'] = ['required_without:items'];
 		}
 
 		return $rules;
