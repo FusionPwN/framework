@@ -24,6 +24,7 @@ class OrderFactory extends BaseOrderFactory
 	public function createFromCheckout(Checkout $checkout)
 	{
 		$cart = $checkout->getCart();
+
 		$orderData = [
 			'type'				=> $checkout->getType(),
 			'user_id'			=> $checkout->getUserId(),
@@ -79,13 +80,21 @@ class OrderFactory extends BaseOrderFactory
 	protected function convertCartItemsToDataArray(CheckoutSubject $cart)
 	{
 		return $cart->getItems()->map(function ($item) {
-			return [
-				'product' 		=> $item->getBuyable(),
-				'adjustments' 	=> $item->adjustments(),
-				'quantity' 		=> $item->getQuantity(),
-				'price'			=> $item->getAdjustedPrice(),
-				'weight'		=> $item->product->weight()
-			];
+			if ($item->product_type == 'product') {
+				return [
+					'type'			=> $item->product_type,
+					'product' 		=> $item->getBuyable(),
+					'adjustments' 	=> $item->adjustments(),
+					'quantity' 		=> $item->getQuantity(),
+					'price'			=> $item->getAdjustedPrice(),
+					'weight'		=> $item->product->weight()
+				];
+			} else if ($item->product_type == 'prescription') {
+				return [
+					'type'	=> $item->product_type,
+					'id' 	=> $item->product_id
+				];
+			}
 		})->all();
 	}
 }
