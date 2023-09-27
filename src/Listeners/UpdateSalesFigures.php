@@ -16,6 +16,8 @@ namespace Vanilo\Framework\Listeners;
 use Vanilo\Contracts\Buyable;
 use Vanilo\Order\Contracts\OrderAwareEvent;
 use Vanilo\Order\Contracts\OrderItem;
+use ReflectionClass;
+use Vanilo\Order\Models\OrderStatusProxy;
 
 class UpdateSalesFigures
 {
@@ -23,13 +25,16 @@ class UpdateSalesFigures
     {
         $order = $event->getOrder();
 
-        foreach ($order->getItems() as $item) {
-            /** @var OrderItem $item */
-            if ($item->product instanceof Buyable) {
-                if ($item->quantity >= 0) {
-                    $item->product->addSale($order->created_at, $item->quantity);
-                } else {
-                    $item->product->removeSale(-1 * $item->quantity);
+        if((new ReflectionClass($event))->getShortName() == "OrderWasCreated" || (new ReflectionClass($event))->getShortName() == "OrderWasCancelled" || $order->status == OrderStatusProxy::CANCELLED()) {
+            foreach ($order->getItems() as $item) {
+                /** @var OrderItem $item */
+                if ($item->product instanceof Buyable) {
+                    
+                    if ($item->quantity >= 0 && (new ReflectionClass($event))->getShortName() != "OrderWasCancelled") {
+                        $item->product->addSale($order->created_at, $item->quantity);
+                    } else {
+                        $item->product->removeSale($item->quantity);
+                    }
                 }
             }
         }
