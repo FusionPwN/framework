@@ -24,13 +24,12 @@ class UpdateSalesFigures
     public function handle(OrderAwareEvent $event)
     {
         $order = $event->getOrder();
-
-        if((new ReflectionClass($event))->getShortName() == "OrderWasCreated" || (new ReflectionClass($event))->getShortName() == "OrderWasCancelled" || $order->status == OrderStatusProxy::CANCELLED()) {
+        if((new ReflectionClass($event))->getShortName() == "OrderWasCreated" || (new ReflectionClass($event))->getShortName() == "OrderWasCancelled" || (new ReflectionClass($event))->getShortName() == "OrderWasRefunded" || $order->status == OrderStatusProxy::CANCELLED() || $order->status == OrderStatusProxy::REFUNDED())  {
             foreach ($order->getItems() as $item) {
                 /** @var OrderItem $item */
                 if ($item->product instanceof Buyable) {
                     
-                    if ($item->quantity >= 0 && (new ReflectionClass($event))->getShortName() != "OrderWasCancelled") {
+                    if ($item->quantity >= 0 && (new ReflectionClass($event))->getShortName() != "OrderWasCancelled" && (new ReflectionClass($event))->getShortName() != "OrderWasRefunded") {
                         $item->product->addSale($order->created_at, $item->quantity);
                     } else {
                         $item->product->removeSale($item->quantity);
