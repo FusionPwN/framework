@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Http\Requests;
 
+use App\Models\Admin\Coupon;
 use App\Models\Admin\Order as AdminOrder;
 use App\Models\Admin\ShipmentMethod;
 use App\Models\Admin\Store;
@@ -37,66 +38,86 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			'status' => [Rule::in(OrderStatusProxy::values())]
 		];
 
-		if ($this->get('type') == 'user') {
-			$rules['user_id'] = ['required', 'exists:users,id'];
-		} else if ($this->get('type') == 'addresses') {
-			$country = $this->shippingCountry();
+		switch ($this->get('type')) {
+			case 'user':
+				$rules['user_id'] = ['required', 'exists:users,id'];
+				break;
+			case 'addresses':
+				$country = $this->shippingCountry();
 
-			$rules['email'] 				= ['required_unless:user_id,null', 'min:2', 'max:255', 'email:rfc,dns'];
-			$rules['phone'] 				= ['required', 'phone:' . $country->iso];
-			$rules['shipping_firstname'] 	= ['required', 'min:2', 'max:255'];
-			$rules['shipping_lastname']  	= ['required', 'min:2', 'max:255'];
-			$rules['shipping_address'] 		= ['required', 'min:2', 'max:255'];
-			$rules['shipping_city'] 		= ['required', 'min:2', 'max:255'];
-			$rules['shipping_country_id'] 	= ['required', 'exists:countries,id'];
-			$rules['shipping_postalcode'] 	= ['required', 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country)];
+				$rules['email'] 				= ['required_unless:user_id,null', 'min:2', 'max:255', 'email:rfc,dns'];
+				$rules['phone'] 				= ['required', 'phone:' . $country->iso];
+				$rules['shipping_firstname'] 	= ['required', 'min:2', 'max:255'];
+				$rules['shipping_lastname']  	= ['required', 'min:2', 'max:255'];
+				$rules['shipping_address'] 		= ['required', 'min:2', 'max:255'];
+				$rules['shipping_city'] 		= ['required', 'min:2', 'max:255'];
+				$rules['shipping_country_id'] 	= ['required', 'exists:countries,id'];
+				$rules['shipping_postalcode'] 	= ['required', 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country)];
 
-			$country = $this->billingCountry();
+				$country = $this->billingCountry();
 
-			$rules['billing_firstname'] 	= ['required_with:billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
-			$rules['billing_lastname']  	= ['required_with:billing_firstname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
-			$rules['billing_address'] 		= ['required_with:billing_firstname,billing_lastname,billing_city,billing_postalcode,nif', 'max:255'];
-			$rules['billing_city'] 			= ['required_with:billing_firstname,billing_lastname,billing_address,billing_postalcode,nif', 'max:255'];
-			$rules['billing_country_id'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'exists:countries,id'];
-			$rules['billing_postalcode'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,nif'];
-			$rules['nif'] 					= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode'];
+				$rules['billing_firstname'] 	= ['required_with:billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
+				$rules['billing_lastname']  	= ['required_with:billing_firstname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
+				$rules['billing_address'] 		= ['required_with:billing_firstname,billing_lastname,billing_city,billing_postalcode,nif', 'max:255'];
+				$rules['billing_city'] 			= ['required_with:billing_firstname,billing_lastname,billing_address,billing_postalcode,nif', 'max:255'];
+				$rules['billing_country_id'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'exists:countries,id'];
+				$rules['billing_postalcode'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,nif'];
+				$rules['nif'] 					= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode'];
 
-			if ($this->get('billing_postalcode') != '' && $this->get('billing_postalcode') !== null) {
-				array_push($rules['billing_postalcode'], 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country));
-			}
-			if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
-				array_push($rules['nif'], new IsValidNIF);
-			}
-		} else if ($this->get('type') == 'shipping-method') {
-			$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
-
-			if (isset($this->shipping['id'])) {
-				$shippingMethod = $this->shippingMethod();
-
-				if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
-					$rules['store.id'] = ['required', 'exists:stores,id'];
+				if ($this->get('billing_postalcode') != '' && $this->get('billing_postalcode') !== null) {
+					array_push($rules['billing_postalcode'], 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country));
 				}
-			}
-		} else if ($this->get('type') == 'payment-method') {
-			$rules['payment.id'] = ['required', 'exists:payment_methods,id'];
+				if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
+					array_push($rules['nif'], new IsValidNIF);
+				}
+				break;
+			case 'shipping-method':
+				$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
 
-			if (isset($this->payment['id'])) {
-				$paymentMethod = $this->paymentMethod();
+				if (isset($this->shipping['id'])) {
+					$shippingMethod = $this->shippingMethod();
 
-				if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
-					$order = $this->order();
-					if ($order->isSimpleBilling()) {
-						$country_service = $order->country;
-					} else {
-						$country_service = $order->billingCountry;
+					if (null !== $shippingMethod && $shippingMethod->isStorePickup() && count($shippingMethod->stores) > 0) {
+						$rules['store.id'] = ['required', 'exists:stores,id'];
 					}
-
-					$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
 				}
-			}
-		} else if ($this->get('type') == 'order-items') {
-			$rules['items'] = ['required_without:itemsalt'];
-			$rules['itemsalt'] = ['required_without:items'];
+				break;
+			case 'payment-method':
+				$rules['payment.id'] = ['required', 'exists:payment_methods,id'];
+
+				if (isset($this->payment['id'])) {
+					$paymentMethod = $this->paymentMethod();
+
+					if (null !== $paymentMethod && strtolower($paymentMethod->getConfigurationValue('SERVICE')) == 'mbw') {
+						$order = $this->order();
+						if ($order->isSimpleBilling()) {
+							$country_service = $order->country;
+						} else {
+							$country_service = $order->billingCountry;
+						}
+
+						$rules['mbway_phone'] = ['required', 'phone:' . $country_service->iso ?? ''];
+					}
+				}
+				break;
+			case 'order-items':
+				$rules['items'] = ['required_without:itemsalt'];
+				$rules['itemsalt'] = ['required_without:items'];
+				break;
+			case 'add-coupon':
+				if (isset($this->coupon_code)) {
+					$rules['coupon_code'] = ['exists:coupons,code'];
+				} else if (isset($this->coupon_select) && $this->coupon_select !== 'no-code') {
+					$rules['coupon_select'] = ['exists:coupons,code'];
+				} else {
+					$rules['coupon_code'] = ['required'];
+					$rules['coupon_select'] = ['required'];
+				}
+
+				break;
+
+			default:
+				break;
 		}
 
 		return $rules;
@@ -147,6 +168,15 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 		return OrderProxy::find($this->order);
 	}
 
+	public function coupon()
+	{
+		if (isset($this->coupon_code)) {
+			return Coupon::where('code', $this->coupon_code)->first();
+		} else if (isset($this->coupon_select) && $this->coupon_select !== 'no-code') {
+			return Coupon::where('code', $this->coupon_select)->first();
+		}
+	}
+
 	public function attributes()
 	{
 		return [
@@ -170,6 +200,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			'store.id' 				=> strtolower(__('frontoffice.pick-up shop')),
 			'mbway_phone' 			=> strtolower(__('frontoffice.phone')),
 			'payment.id' 			=> strtolower(__('frontoffice.payment_method')),
+			'coupon_code' 			=> strtolower(__('frontoffice.coupon_checkout')),
+			'coupon_select' 		=> strtolower(__('frontoffice.coupon_checkout')),
 		];
 	}
 
