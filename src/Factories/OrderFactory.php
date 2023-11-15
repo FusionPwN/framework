@@ -64,6 +64,7 @@ class OrderFactory extends BaseOrderFactory
 
 		$items = $order->items->map(function ($item) {
 			return [
+				'type'			 => $item->product_type,
 				'product' 		 => $item->getBuyable(),
 				'adjustments' 	 => $item->adjustments(),
 				'quantity' 		 => $item->getQuantity(),
