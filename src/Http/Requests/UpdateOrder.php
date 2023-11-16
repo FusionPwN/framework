@@ -163,6 +163,25 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 		return Store::find($this->store['id']);
 	}
 
+	public function pickup()
+	{
+		$shippingMethod = $this->shippingMethod();
+
+		if($shippingMethod->slug == "ctt_pickup"){
+			return CttPickupStore::where('pup_id',$this->pickup['id'])->first();
+		} else if($shippingMethod->slug == "dpd_pickup"){
+			$pickup = DpdPickupStore::where('number',$this->pickup['id'])->first();
+			
+			$pickup->display_name = $pickup->name;
+			$pickup->pup_id = $pickup->number;
+			$pickup->street_name = $pickup->address;
+			$pickup->postalcode = $pickup->postalCode;
+			$pickup->town = $pickup->postalCodeLocation;
+			
+			return $pickup;
+		}
+	}
+
 	public function order(): AdminOrder
 	{
 		return OrderProxy::find($this->order);
