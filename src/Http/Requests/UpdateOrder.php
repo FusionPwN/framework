@@ -29,6 +29,8 @@ use Konekt\Address\Models\Country;
 use Konekt\Address\Models\CountryProxy;
 use Vanilo\Framework\Models\PaymentMethod;
 use Vanilo\Order\Models\OrderProxy;
+use App\Models\Admin\CttPickupStore;
+use App\Models\Admin\DpdPickupStore;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
