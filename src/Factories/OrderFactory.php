@@ -64,14 +64,16 @@ class OrderFactory extends BaseOrderFactory
 
 		$items = $order->items->map(function ($item) {
 			return [
-				'type'			 => $item->product_type,
-				'product' 		 => $item->getBuyable(),
-				'adjustments' 	 => $item->adjustments(),
-				'quantity' 		 => $item->getQuantity(),
-				'original_price' => $item->getOriginalPrice(),
-				'mod_price'		 => $item->getModifiedPrice(),
-				'price'			 => $item->getAdjustedPrice(),
-				'weight'		 => $item->product->weight()
+				'id'						=> $item->id,
+				'type'			 			=> $item->product_type,
+				'product' 		 			=> $item->getBuyable(),
+				'adjustments' 	 			=> $item->adjustments(),
+				'adjustments_collection' 	=> [],
+				'quantity' 		 			=> $item->getQuantity(),
+				'original_price' 			=> $item->getOriginalPrice(),
+				'mod_price'		 			=> $item->getModifiedPrice(),
+				'price'			 			=> $item->getAdjustedPrice(),
+				'weight'		 			=> $item->product->weight()
 			];
 		})->all();
 
@@ -83,12 +85,14 @@ class OrderFactory extends BaseOrderFactory
 		return $cart->getItems()->map(function ($item) {
 			if ($item->product_type == 'product') {
 				return [
-					'type'			=> $item->product_type,
-					'product' 		=> $item->getBuyable(),
-					'adjustments' 	=> $item->adjustments(),
-					'quantity' 		=> $item->getQuantity(),
-					'price'			=> $item->getAdjustedPrice(),
-					'weight'		=> $item->product->weight()
+					'id'						=> $item->id,
+					'type'						=> $item->product_type,
+					'product' 					=> $item->getBuyable(),
+					'adjustments' 				=> $item->adjustments(),
+					'adjustments_collection' 	=> [],
+					'quantity' 					=> $item->getQuantity(),
+					'price'						=> $item->getAdjustedPrice(),
+					'weight'					=> $item->product->weight()
 				];
 			} else if ($item->product_type == 'prescription') {
 				return [
