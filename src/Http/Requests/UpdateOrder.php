@@ -73,6 +73,16 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 					array_push($rules['nif'], new IsValidNIF);
 				}
 				break;
+			case 'user-info':
+				$country = $this->shippingCountry();
+
+				$rules['email'] 				= ['required_unless:user_id,null', 'min:2', 'max:255', 'email:rfc,dns'];
+				$rules['phone'] 				= ['required', 'phone:' . $country->iso];
+				$rules['shipping_firstname'] 	= ['required', 'min:2', 'max:255'];
+				$rules['shipping_lastname']  	= ['required', 'min:2', 'max:255'];
+				$rules['shipping_country_id'] 	= ['required', 'exists:countries,id'];
+
+				break;
 			case 'shipping-method':
 				$rules['shipping.id'] = ['required', 'exists:shipment_methods,id'];
 
@@ -169,17 +179,17 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 	{
 		$shippingMethod = $this->shippingMethod();
 
-		if($shippingMethod->slug == "ctt_pickup"){
-			return CttPickupStore::where('pup_id',$this->pickup['id'])->first();
-		} else if($shippingMethod->slug == "dpd_pickup"){
-			$pickup = DpdPickupStore::where('number',$this->pickup['id'])->first();
-			
+		if ($shippingMethod->slug == "ctt_pickup") {
+			return CttPickupStore::where('pup_id', $this->pickup['id'])->first();
+		} else if ($shippingMethod->slug == "dpd_pickup") {
+			$pickup = DpdPickupStore::where('number', $this->pickup['id'])->first();
+
 			$pickup->display_name = $pickup->name;
 			$pickup->pup_id = $pickup->number;
 			$pickup->street_name = $pickup->address;
 			$pickup->postalcode = $pickup->postalCode;
 			$pickup->town = $pickup->postalCodeLocation;
-			
+
 			return $pickup;
 		}
 	}
