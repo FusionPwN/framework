@@ -127,7 +127,13 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 				}
 
 				break;
+			case 'custom-product':
+				$rules['custom-product-price'] = 	['required', 'numeric'];
+				$rules['custom-product-weight'] = 	['required', 'numeric'];
+				$rules['custom-product-quantity'] = ['required', 'numeric'];
+				$rules['custom-product-vat'] = 		['required', 'numeric'];
 
+				break;
 			default:
 				break;
 		}
