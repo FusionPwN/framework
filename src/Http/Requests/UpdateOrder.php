@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Vanilo\Framework\Http\Requests;
 
+use App\Http\Controllers\Admin\DelnextController;
 use App\Models\Admin\Coupon;
 use App\Models\Admin\Order as AdminOrder;
 use App\Models\Admin\ShipmentMethod;
@@ -196,6 +197,16 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			$pickup->postalcode = $pickup->postalCode;
 			$pickup->town = $pickup->postalCodeLocation;
 
+			return $pickup;
+		} else if($shippingMethod->slug == "delnext_pickup"){
+			$pickup = DelnextController::getPickups($this->pickup_point,$this->pickup['id']);
+			
+			$pickup->display_name = $pickup->pickup_point_name;
+			$pickup->pup_id = $pickup->pickup_point_code;
+			$pickup->street_name = $pickup->pickup_point_address;
+			$pickup->postalcode = $pickup->pickup_point_zip;
+			$pickup->town = $pickup->pickup_point_city;
+			
 			return $pickup;
 		}
 	}
