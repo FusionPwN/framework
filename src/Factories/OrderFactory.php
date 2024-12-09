@@ -92,7 +92,8 @@ class OrderFactory extends BaseOrderFactory
 					'adjustments_collection' 	=> [],
 					'quantity' 					=> $item->getQuantity(),
 					'price'						=> $item->getAdjustedPrice(),
-					'weight'					=> $item->product->weight()
+					'weight'					=> $item->product->weight(),
+					'gift_quantity'				=> $item->gift_quantity,
 				];
 			} else if ($item->product_type == 'prescription') {
 				return [
