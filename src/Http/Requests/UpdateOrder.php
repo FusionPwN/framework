@@ -59,20 +59,23 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 
 				$country = $this->billingCountry();
 
-				$rules['billing_firstname'] 	= ['required_with:billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
-				$rules['billing_lastname']  	= ['required_with:billing_firstname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
-				$rules['billing_address'] 		= ['required_with:billing_firstname,billing_lastname,billing_city,billing_postalcode,nif', 'max:255'];
-				$rules['billing_city'] 			= ['required_with:billing_firstname,billing_lastname,billing_address,billing_postalcode,nif', 'max:255'];
-				$rules['billing_country_id'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'exists:countries,id'];
-				$rules['billing_postalcode'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,nif'];
-				$rules['nif'] 					= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode'];
+				if(isset($this->nif) && !empty($this->nif)){
+					$rules['billing_firstname'] 	= ['required_with:billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
+					$rules['billing_lastname']  	= ['required_with:billing_firstname,billing_address,billing_city,billing_postalcode,nif', 'max:255'];
+					$rules['billing_address'] 		= ['required_with:billing_firstname,billing_lastname,billing_city,billing_postalcode,nif', 'max:255'];
+					$rules['billing_city'] 			= ['required_with:billing_firstname,billing_lastname,billing_address,billing_postalcode,nif', 'max:255'];
+					$rules['billing_country_id'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode,nif', 'exists:countries,id'];
+					$rules['billing_postalcode'] 	= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,nif'];
+					$rules['nif'] 					= ['required_with:billing_firstname,billing_lastname,billing_address,billing_city,billing_postalcode'];
 
-				if ($this->get('billing_postalcode') != '' && $this->get('billing_postalcode') !== null) {
-					array_push($rules['billing_postalcode'], 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country));
+					if ($this->get('billing_postalcode') != '' && $this->get('billing_postalcode') !== null) {
+						array_push($rules['billing_postalcode'], 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country));
+					}
+					if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
+						array_push($rules['nif'], new IsValidNIF);
+					}
 				}
-				if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
-					array_push($rules['nif'], new IsValidNIF);
-				}
+				
 				break;
 			case 'user-info':
 				$country = $this->shippingCountry();
