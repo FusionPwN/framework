@@ -213,7 +213,7 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			
 			return $pickup;
 		}else if($shippingMethod->slug == "dhl_pickup"){
-			$pickup = DhlController::getPickups($this->pickup_point,$this->pickup['id']);
+			$pickup = DhlController::getPickups($this->pickup_point_dhl,$this->pickup['id']);
 			
 			$pickup->display_name = $pickup->name;
 			$pickup->pup_id = $pickup->id;
