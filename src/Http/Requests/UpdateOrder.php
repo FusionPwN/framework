@@ -32,6 +32,7 @@ use Vanilo\Framework\Models\PaymentMethod;
 use Vanilo\Order\Models\OrderProxy;
 use App\Models\Admin\CttPickupStore;
 use App\Models\Admin\DpdPickupStore;
+use App\Http\Controllers\Admin\DhlController;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
@@ -209,6 +210,16 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			$pickup->street_name = $pickup->pickup_point_address;
 			$pickup->postalcode = $pickup->pickup_point_zip;
 			$pickup->town = $pickup->pickup_point_city;
+			
+			return $pickup;
+		}else if($shippingMethod->slug == "dhl"){
+			$pickup = DhlController::getPickups($this->pickup_point,$this->pickup['id']);
+			
+			$pickup->display_name = $pickup->name;
+			$pickup->pup_id = $pickup->id;
+			$pickup->street_name = $pickup->address->street;
+			$pickup->postalcode = $pickup->address->postalCode;
+			$pickup->town = $pickup->address->city;
 			
 			return $pickup;
 		}
