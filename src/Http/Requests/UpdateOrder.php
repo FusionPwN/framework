@@ -230,7 +230,7 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			$pickup->pup_id = $pickup->idPtoExterno;
 			$pickup->street_name = $pickup->direccionPtoConv;
 			$pickup->postalcode = $pickup->codigoPostalPtoConv;
-			$pickup->town = $pickup->codigoPostalPtoConv;
+			$pickup->town = $pickup->ciudadPtoConv;
 			
 			return $pickup;
 		}
