@@ -33,6 +33,7 @@ use Vanilo\Order\Models\OrderProxy;
 use App\Models\Admin\CttPickupStore;
 use App\Models\Admin\DpdPickupStore;
 use App\Http\Controllers\Admin\DhlController;
+use App\Http\Controllers\admin\CorreosController;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
@@ -220,6 +221,16 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			$pickup->street_name = $pickup->address->street;
 			$pickup->postalcode = $pickup->address->postalCode;
 			$pickup->town = $pickup->address->city;
+			
+			return $pickup;
+		} else if($shippingMethod->slug == "correos_pickup"){
+			$pickup = CorreosController::getPickups($this->pickup_point_correos,$this->pickup['id']);
+			
+			$pickup->display_name = $pickup->nombrePtoConv;
+			$pickup->pup_id = $pickup->idPtoExterno;
+			$pickup->street_name = $pickup->direccionPtoConv;
+			$pickup->postalcode = $pickup->codigoPostalPtoConv;
+			$pickup->town = $pickup->codigoPostalPtoConv;
 			
 			return $pickup;
 		}
