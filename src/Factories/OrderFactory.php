@@ -75,6 +75,7 @@ class OrderFactory extends BaseOrderFactory
 				'price'			 			=> $item->getAdjustedPrice(),
 				'weight'		 			=> $item->product->weight(),
 				'info'						=> $item->product->info,
+				'properties'				=> $item->properties,
 			];
 		})->all();
 
@@ -96,6 +97,7 @@ class OrderFactory extends BaseOrderFactory
 					'weight'					=> $item->product->weight(),
 					'gift_quantity'				=> $item->gift_quantity,
 					'info'						=> $item->product->info,
+					'properties'				=> $item->properties,
 				];
 			} else if ($item->product_type == 'prescription') {
 				return [
