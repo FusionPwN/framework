@@ -19,7 +19,7 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "laravel/framework": "~9.0|~10.0|~11.0|~12.0",
-        "konekt/concord": "^1.10",
+        "konekt/concord": "^1.14|^1.16",
         "spatie/laravel-medialibrary": "^8.0|^9.0|^10.0|^11.0"
     },
     "autoload": {
