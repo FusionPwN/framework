@@ -73,8 +73,8 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 					if ($this->get('billing_postalcode') != '' && $this->get('billing_postalcode') !== null) {
 						array_push($rules['billing_postalcode'], 'postal_code:' . $country->iso, new IsValidPostalCodePTC($country));
 					}
-					if ($country->iso == 'PT' && $this->get('nif') != '' && $this->get('nif') !== null) {
-						array_push($rules['nif'], new IsValidNIF);
+					if ($this->get('nif') != '' && $this->get('nif') !== null) {
+						array_push($rules['nif'], new IsValidNIF($country->iso));
 					}
 				}
 				
