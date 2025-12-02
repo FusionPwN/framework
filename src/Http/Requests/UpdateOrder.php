@@ -34,6 +34,7 @@ use App\Models\Admin\CttPickupStore;
 use App\Models\Admin\DpdPickupStore;
 use App\Http\Controllers\Admin\DhlController;
 use App\Http\Controllers\admin\CorreosController;
+use App\Models\Admin\NacexPickupStore;
 
 class UpdateOrder extends FormRequest implements UpdateOrderContract
 {
@@ -231,6 +232,16 @@ class UpdateOrder extends FormRequest implements UpdateOrderContract
 			$pickup->street_name = $pickup->direccionPtoConv;
 			$pickup->postalcode = $pickup->codigoPostalPtoConv;
 			$pickup->town = $pickup->ciudadPtoConv;
+			
+			return $pickup;
+		} else if($shippingMethod->slug == "nacex_pickup"){
+			$pickup = NacexPickupStore::where('shop_codigo',$this->pickup['id'])->first();
+			
+			$pickup->display_name = $pickup->shop_nombre;
+			$pickup->pup_id = $pickup->shop_codigo;
+			$pickup->street_name = $pickup->shop_direccion;
+			$pickup->postalcode = $pickup->pueb_codigo_postal;
+			$pickup->town = $pickup->pueb_codigo_nombre;
 			
 			return $pickup;
 		}
