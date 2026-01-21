@@ -34,6 +34,7 @@ class OrderFactory extends BaseOrderFactory
 			'total' 			=> 0,
 			'vat'               => 0,
 			'adjustments'       => null,
+			'cart_properties'	=> $cart->properties ?? null,
 		];
 
 		if (null !== $cart) {
