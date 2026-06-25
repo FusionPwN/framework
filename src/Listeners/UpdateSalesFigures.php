@@ -18,9 +18,35 @@ use Vanilo\Order\Contracts\OrderAwareEvent;
 use Vanilo\Order\Contracts\OrderItem;
 use ReflectionClass;
 use Vanilo\Order\Models\OrderStatusProxy;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Support\Database\DatabaseLockRetry;
 
-class UpdateSalesFigures
+class UpdateSalesFigures implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    /**
+     * The name of the queue the job should be sent to.
+     *
+     * @var string|null
+     */
+    public $queue = 'products_process:high';
+
+    /**
+     * The time (seconds) before the job should be processed.
+     *
+     * @var int
+     */
+    public $delay = 1;
+
+    /**
+     * The number of times the queued listener may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 5;
+
     public function handle(OrderAwareEvent $event)
     {
         $order = $event->getOrder();
@@ -28,12 +54,13 @@ class UpdateSalesFigures
             foreach ($order->getItems() as $item) {
                 /** @var OrderItem $item */
                 if ($item->product instanceof Buyable) {
-                    
-                    if ($item->quantity >= 0 && (new ReflectionClass($event))->getShortName() != "OrderWasCancelled" && (new ReflectionClass($event))->getShortName() != "OrderWasRefunded") {
-                        $item->product->addSale($order->created_at, $item->quantity);
-                    } else {
-                        $item->product->removeSale($item->quantity);
-                    }
+                    DatabaseLockRetry::run(function () use ($event, $item, $order) {
+                        if ($item->quantity >= 0 && (new ReflectionClass($event))->getShortName() != "OrderWasCancelled" && (new ReflectionClass($event))->getShortName() != "OrderWasRefunded") {
+                            $item->product->addSale($order->created_at, $item->quantity);
+                        } else {
+                            $item->product->removeSale($item->quantity);
+                        }
+                    }, 6);
                 }
             }
         }
